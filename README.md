@@ -5,7 +5,7 @@ Vercel + Supabase deployment for Nilkanth Infotech review generation.
 ## Architecture
 
 - `app.html` is the Vercel-hosted frontend.
-- `api/generate-review.py` is the Vercel Python API endpoint.
+- `api/index.py` is the Vercel Python API endpoint.
 - Supabase stores service rotation state and generated review history.
 - OpenAI generates the review text.
 
@@ -52,7 +52,7 @@ This checks JSON parsing, Python syntax, frontend dropdown sync, and prompt rend
 
 Push this repo to GitHub, then import it in Vercel.
 
-Vercel should detect the Python API from `api/generate-review.py` and install
+Vercel should detect the Python API from `api/index.py` and install
 dependencies from `requirements.txt`.
 
 ## Important Security Notes
