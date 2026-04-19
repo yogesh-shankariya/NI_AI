@@ -4,10 +4,6 @@
     {
       "source": "/api/generate-review",
       "destination": "/api"
-    },
-    {
-      "source": "/",
-      "destination": "/app.html"
     }
   ]
 }

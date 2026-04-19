@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Generator - Nilkanth Infotech</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  color: #17202a;
+  margin: 0;
+}
+
+.container {
+  max-width: 520px;
+  margin: auto;
+  padding: 18px;
+}
+
+.card {
+  background: #fff;
+  padding: 22px;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(23, 32, 42, 0.1);
+}
+
+h2 {
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-top: 14px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+input,
+select,
+button,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 7px;
+  border-radius: 8px;
+  border: 1px solid #c8d0d8;
+  font-size: 16px;
+  background: #fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #1f7ae0;
+  border-color: #1f7ae0;
+}
+
+button {
+  margin-top: 16px;
+  background: #1f7ae0;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1768c6;
+}
+
+button:disabled {
+  background: #98a2b3;
+  cursor: wait;
+}
+
+textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+.status {
+  min-height: 20px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.status.error {
+  color: #b42318;
+}
+
+.status.success {
+  color: #067647;
+}
+
+.hidden {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2>Review Generator</h2>
+
+    <label for="service">Service</label>
+    <select id="service" name="service" required></select>
+
+    <label for="area">Area</label>
+    <select id="area" name="area" required></select>
+
+    <label for="subarea">Subarea</label>
+    <select id="subarea" name="subarea" required></select>
+
+    <label for="propertyType">Property Type</label>
+    <select id="propertyType" name="propertyType" required></select>
+
+    <div id="cameraCountField">
+      <label for="numberOfCameras">Number of Cameras</label>
+      <input type="number" id="numberOfCameras" name="numberOfCameras" min="1" step="1" inputmode="numeric" placeholder="Example: 8">
+    </div>
+
+    <label for="cameraBrand">Camera Brand</label>
+    <input type="text" id="cameraBrand" name="cameraBrand" placeholder="Example: Hikvision">
+
+    <button type="button" id="generateButton" onclick="generateReview()">Generate Review</button>
+
+    <div id="statusMessage" class="status" aria-live="polite"></div>
+
+    <textarea id="output" placeholder="Generated review will appear here..." readonly></textarea>
+
+    <button type="button" onclick="copyText()">Copy Review</button>
+    <button type="button" onclick="openGoogle()">Post on Google</button>
+  </div>
+</div>
+
+<script>
+const SERVICE_OPTIONS = [
+  "CCTV Installation",
+  "Wireless Intrusion Alarm System",
+  "Video Door Phone",
+  "Intercom System"
+];
+
+const LOCATION_DATA = {
+  "Ahmedabad": [
+    "Satellite",
+    "Vastrapur",
+    "Bodakdev",
+    "Prahlad Nagar",
+    "SG Highway",
+    "Thaltej",
+    "Gota",
+    "Chandlodia",
+    "New Ranip",
+    "Ranip",
+    "Nikol",
+    "Naroda",
+    "Narol",
+    "Odhav",
+    "Vastral",
+    "Isanpur",
+    "Vatva",
+    "Lambha",
+    "Motera",
+    "Chandkheda",
+    "Tragad",
+    "Shela",
+    "Shilaj",
+    "South Bopal",
+    "Bopal",
+    "Ghuma",
+    "Science City",
+    "Changodar GIDC",
+    "Kathwada GIDC",
+    "Odhav GIDC",
+    "Vatva GIDC",
+    "Naroda GIDC",
+    "Sanand GIDC",
+    "Bakrol GIDC",
+    "Bavla GIDC",
+    "Kubadthal",
+    "Kathwada",
+    "Singarva",
+    "Bhuvaldi",
+    "Kuha",
+    "Bakrol",
+    "Kanbha",
+    "Khoraj",
+    "Oganaj",
+    "Nana Chiloda",
+    "Mota Chiloda",
+    "Moraiya",
+    "Hathijan",
+    "Kadadara",
+    "Dhamatvan",
+    "Vinzol",
+    "Ropada"
+  ],
+  "Gandhinagar": [
+    "Adalaj",
+    "Koba",
+    "Zundal",
+    "Gift City",
+    "Kudasan",
+    "Raysan",
+    "Dehgam",
+    "Bhat",
+    "Lapkaman",
+    "Chhatral GIDC",
+    "Zak GIDC"
+  ]
+};
+
+const PROPERTY_TYPE_OPTIONS = [
+  "house",
+  "flat",
+  "apartment",
+  "bungalow",
+  "villa",
+  "office",
+  "warehouse",
+  "factory",
+  "workshop",
+  "shop",
+  "showroom",
+  "retail store",
+  "clinic",
+  "hospital",
+  "school",
+  "college",
+  "coaching center",
+  "hostel",
+  "apartment complex",
+  "farmhouse",
+  "godown",
+  "restaurant",
+  "cafe",
+  "property"
+];
+
+const CCTV_SERVICE = "CCTV Installation";
+
+function populateSelect(selectId, options) {
+  const select = document.getElementById(selectId);
+
+  select.innerHTML = "";
+
+  options.forEach(function(value) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value;
+    select.appendChild(option);
+  });
+}
+
+function populateSubareas() {
+  const area = document.getElementById("area").value;
+  populateSelect("subarea", LOCATION_DATA[area] || []);
+}
+
+function updateCameraFields() {
+  const service = document.getElementById("service").value;
+  const cameraCountField = document.getElementById("cameraCountField");
+  const numberOfCameras = document.getElementById("numberOfCameras");
+
+  if (service === CCTV_SERVICE) {
+    cameraCountField.classList.remove("hidden");
+  } else {
+    cameraCountField.classList.add("hidden");
+    numberOfCameras.value = "";
+  }
+}
+
+function setStatus(message, type) {
+  const statusMessage = document.getElementById("statusMessage");
+  statusMessage.textContent = message;
+  statusMessage.className = "status";
+
+  if (type) {
+    statusMessage.classList.add(type);
+  }
+}
+
+function setGenerating(isGenerating) {
+  const generateButton = document.getElementById("generateButton");
+  generateButton.disabled = isGenerating;
+  generateButton.textContent = isGenerating ? "Generating..." : "Generate Review";
+}
+
+async function generateReview() {
+  const service = document.getElementById("service").value;
+  const area = document.getElementById("area").value;
+  const subarea = document.getElementById("subarea").value;
+  const propertyType = document.getElementById("propertyType").value;
+  const numberOfCameras = document.getElementById("numberOfCameras").value.trim();
+  const cameraBrand = document.getElementById("cameraBrand").value.trim();
+
+  if (service === CCTV_SERVICE && numberOfCameras !== "" && !/^[1-9][0-9]*$/.test(numberOfCameras)) {
+    alert("Number of cameras must be a whole number.");
+    return;
+  }
+
+  const payload = {
+    service: service,
+    area: area,
+    subarea: subarea,
+    property_type: propertyType,
+    number_of_cameras: service === CCTV_SERVICE ? numberOfCameras : "",
+    camera_brand: cameraBrand
+  };
+
+  setGenerating(true);
+  setStatus("", "");
+
+  try {
+    const response = await fetch("/api/generate-review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Could not generate review.");
+    }
+
+    document.getElementById("output").value = result.review || "";
+    setStatus("Review generated.", "success");
+  } catch (error) {
+    setStatus(error.message, "error");
+  } finally {
+    setGenerating(false);
+  }
+}
+
+function copyText() {
+  const text = document.getElementById("output");
+  text.select();
+  document.execCommand("copy");
+  alert("Copied!");
+}
+
+function openGoogle() {
+  window.open("https://g.page/r/CTjtyeEyrKNIEAE/review");
+}
+
+document.getElementById("area").addEventListener("change", populateSubareas);
+document.getElementById("service").addEventListener("change", updateCameraFields);
+
+populateSelect("service", SERVICE_OPTIONS);
+populateSelect("area", Object.keys(LOCATION_DATA));
+populateSelect("propertyType", PROPERTY_TYPE_OPTIONS);
+populateSubareas();
+updateCameraFields();
+</script>
+
+</body>
+</html>
