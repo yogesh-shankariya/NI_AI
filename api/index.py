@@ -242,6 +242,12 @@ class handler(BaseHTTPRequestHandler):
         self.send_common_headers()
         self.end_headers()
 
+    def do_HEAD(self) -> None:
+        self.send_response(200)
+        self.send_common_headers()
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_POST(self) -> None:
         try:
             content_length = int(self.headers.get("Content-Length", "0"))
