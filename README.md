@@ -6,7 +6,7 @@ Vercel + Supabase deployment for Nilkanth Infotech review generation.
 
 - `app.html` is the Vercel-hosted frontend.
 - `api/index.py` is the Vercel Python API endpoint.
-- Supabase stores service rotation state and generated review history.
+- Supabase stores service rotation state and only the latest 10 generated reviews per service.
 - OpenAI generates the review text.
 
 ## Required Vercel Environment Variables
@@ -37,6 +37,11 @@ ALLOWED_ORIGIN=https://your-project.vercel.app
    - `service_state`
    - `review_history`
    - `reserve_review_state`
+   - `trim_review_history_to_latest_10`
+
+`review_history` is intentionally kept small. After every generated review,
+Supabase automatically deletes older rows so only the latest 10 reviews per
+service remain, matching the old local JSON cache behavior.
 
 ## Local Validation
 

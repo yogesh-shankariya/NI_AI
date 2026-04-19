@@ -35,6 +35,41 @@ create table if not exists public.review_history (
 create index if not exists review_history_service_created_at_idx
   on public.review_history (service, created_at desc);
 
+create or replace function public.trim_review_history_to_latest_10()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  delete from public.review_history
+  where service = new.service
+    and id in (
+      select id
+      from (
+        select
+          id,
+          row_number() over (
+            partition by service
+            order by created_at desc, id desc
+          ) as row_number
+        from public.review_history
+        where service = new.service
+      ) ranked_reviews
+      where row_number > 10
+    );
+
+  return new;
+end;
+$$;
+
+drop trigger if exists review_history_trim_to_latest_10 on public.review_history;
+
+create trigger review_history_trim_to_latest_10
+after insert on public.review_history
+for each row
+execute function public.trim_review_history_to_latest_10();
+
 alter table public.service_state enable row level security;
 alter table public.review_history enable row level security;
 
@@ -93,3 +128,18 @@ values
   ('Video Door Phone'),
   ('Intercom System')
 on conflict (service) do nothing;
+
+delete from public.review_history
+where id in (
+  select id
+  from (
+    select
+      id,
+      row_number() over (
+        partition by service
+        order by created_at desc, id desc
+      ) as row_number
+    from public.review_history
+  ) ranked_reviews
+  where row_number > 10
+);
