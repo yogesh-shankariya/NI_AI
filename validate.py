@@ -82,6 +82,7 @@ def check_prompt_rendering() -> None:
             "focus_2": selected_inputs["focus_2"],
             "tone_rule": selected_inputs["tone_rule"],
             "perspective_rule": selected_inputs["perspective_rule"],
+            "review_structure_rule": selected_inputs["review_structure_rule"],
             "property_location_rule": selected_inputs["property_location_rule"],
             "company_name_rule": selected_inputs["company_name_rule"],
             "avoid_words_rule": selected_inputs["avoid_words_rule"],

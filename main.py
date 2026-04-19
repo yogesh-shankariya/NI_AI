@@ -34,12 +34,25 @@ PROPERTY_LOCATION_RULES = [
     "Mention the property type naturally near the end of the first sentence and skip location completely.",
     "Mention the property type naturally in the middle of the second sentence and skip location completely.",
     "Mention the property type naturally near the end of the second sentence and skip location completely.",
-    "Mention one combined property type and location phrase near the end of the first sentence.",
-    "Mention one combined property type and location phrase in the middle of the second sentence.",
-    "Mention one combined property type and location phrase near the end of the second sentence.",
-    "Mention the property type naturally near the end of the third sentence if the review has three sentences, and skip location completely.",
-    "Mention one combined property type and location phrase near the end of the third sentence if the review has three sentences, otherwise use the second sentence.",
-    "Mention the property type naturally in the first sentence and mention one combined property type and location phrase later in the review only if it feels natural.",
+    "Mention one combined property type and location phrase naturally once.",
+    "Mention the property type naturally near the beginning of the review and skip location completely.",
+    "Mention the property type naturally in the second sentence and skip location completely.",
+    "Mention the property type naturally near the end of the review and skip location completely.",
+    "Mention the property type naturally once and skip location completely.",
+    "Mention one combined property type and location phrase naturally once.",
+]
+
+REVIEW_STRUCTURE_RULES = [
+    "Use a property-first structure. Start from the property/use case context, then connect it to the service result. Do not start with I had, I got, We had, or We got.",
+    "Use a service-first structure. Start from the selected service work, then mention the property type and focus points naturally.",
+    "Use a result-first structure. Start with the practical outcome or improvement, then explain the service experience.",
+    "Use a team/process-first structure. Start with how the team handled checking, planning, installation, setup, or explanation.",
+    "Use a location-and-company structure. If the company and location rules ask for them, include both naturally once without making the sentence sound like an ad.",
+    "Use a detail-first structure. Start with a concrete service detail such as wiring, setup, coverage, configuration, explanation, or handover.",
+    "Use a support-first structure. Start with guidance, response, explanation, or after-service confidence, then mention the work done.",
+    "Use a recommendation-first structure. Start like a genuine customer recommendation, then include the selected service and focus points.",
+    "Use a short direct structure. Keep it simple and conversational, with a different opening from recent reviews.",
+    "Use a neutral summary structure. If the company and location rules ask for them, include both naturally once and avoid starting with I or we.",
 ]
 
 DEFAULT_STATE = {
@@ -65,11 +78,11 @@ TONE_RULES = [
 ]
 
 PERSPECTIVE_RULES = [
-    "Use first-person singular and start naturally with I got.",
-    "Use first-person plural and start naturally with We got.",
-    "Use first-person singular and start naturally with I had.",
-    "Use first-person plural and start naturally with We had.",
-    "Use a third-person or neutral service-focused style, such as starting with The setup, The installation, or The service. Do not start with I or we.",
+    "Use first-person singular with varied wording. You may use I, my, or me, but do not force the review to start with I got or I had.",
+    "Use first-person plural with varied wording. You may use we, our, or us, but do not force the review to start with We got or We had.",
+    "Use first-person singular with a different opening shape from recent reviews. Avoid repeating the same first three or four words.",
+    "Use first-person plural with a different opening shape from recent reviews. Avoid repeating the same first three or four words.",
+    "Use a third-person or neutral service-focused style. Do not start with I or we.",
 ]
 
 AVOID_WORD_RULES = [
@@ -177,8 +190,8 @@ def push_limited(items: list, value: Any, limit: int) -> list:
 
 def get_company_name_rule(counter: int) -> str:
     if counter % COMPANY_NAME_RULE_EVERY == 0:
-        return "Mention Nilkanth Infotech naturally once if it fits."
-    return "Do not mention company name unless it fits very naturally."
+        return "Mention Nilkanth Infotech naturally once."
+    return "Do not mention Nilkanth Infotech or any company name."
 
 
 def build_focus_pairs(selected_service: str, focus_categories: dict[str, list[str]]) -> list[tuple[str, str]]:
@@ -212,6 +225,7 @@ def get_next_inputs(selected_service: str, state: dict, seo_data: dict, service_
     focus_1, focus_2 = focus_pairs[state["focus_index"] % len(focus_pairs)]
     tone_rule = TONE_RULES[state["tone_index"] % len(TONE_RULES)]
     perspective_rule = PERSPECTIVE_RULES[state["perspective_index"] % len(PERSPECTIVE_RULES)]
+    review_structure_rule = REVIEW_STRUCTURE_RULES[state["generation_count"] % len(REVIEW_STRUCTURE_RULES)]
     property_location_rule = PROPERTY_LOCATION_RULES[
         state["property_location_style_index"] % len(PROPERTY_LOCATION_RULES)
     ]
@@ -224,6 +238,7 @@ def get_next_inputs(selected_service: str, state: dict, seo_data: dict, service_
         "focus_2": focus_2,
         "tone_rule": tone_rule,
         "perspective_rule": perspective_rule,
+        "review_structure_rule": review_structure_rule,
         "property_location_rule": property_location_rule,
         "avoid_words_rule": avoid_words_rule,
         "company_name_rule": company_name_rule,
@@ -324,6 +339,7 @@ def generate_review_from_state(
         "focus_2": selected_inputs["focus_2"],
         "tone_rule": selected_inputs["tone_rule"],
         "perspective_rule": selected_inputs["perspective_rule"],
+        "review_structure_rule": selected_inputs["review_structure_rule"],
         "property_location_rule": selected_inputs["property_location_rule"],
         "company_name_rule": selected_inputs["company_name_rule"],
         "avoid_words_rule": selected_inputs["avoid_words_rule"],
@@ -430,6 +446,7 @@ def generate_review(
         print(f"Focus 2 used: {selected_inputs['focus_2']}")
         print(f"Tone rule used: {selected_inputs['tone_rule']}")
         print(f"Perspective rule used: {selected_inputs['perspective_rule']}")
+        print(f"Review structure rule used: {selected_inputs['review_structure_rule']}")
         print(f"Property and location rule used: {selected_inputs['property_location_rule']}")
         print(f"Company name rule used: {selected_inputs['company_name_rule']}")
         print(f"Avoid words rule used: {selected_inputs['avoid_words_rule']}")

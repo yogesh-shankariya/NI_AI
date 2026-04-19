@@ -221,6 +221,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
             "focus_1": selected_inputs["focus_1"],
             "focus_2": selected_inputs["focus_2"],
             "perspective_rule": selected_inputs["perspective_rule"],
+            "review_structure_rule": selected_inputs["review_structure_rule"],
             "timings_ms": timings_ms,
         },
     }
