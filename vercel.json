@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/**/*.py": {
+    "api/generate-review.py": {
       "maxDuration": 300,
       "excludeFiles": "{.git/**,.venv/**,venv/**,__pycache__/**,state/**,streamlit.py}"
     }
