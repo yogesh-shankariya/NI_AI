@@ -1,0 +1,308 @@
+{
+  "services": {
+    "CCTV Installation": {
+      "focus_categories": {
+        "installation": [
+          "installation was done neatly",
+          "work finished on time",
+          "setup was smooth",
+          "wiring was clean",
+          "camera fitting was proper",
+          "work was handled without much disturbance",
+          "installation felt organized",
+          "team worked carefully",
+          "setup was completed without confusion",
+          "camera setup was managed well"
+        ],
+        "team_experience": [
+          "team explained things clearly",
+          "staff were polite",
+          "technicians knew what they were doing",
+          "communication was easy",
+          "team understood what was needed",
+          "they answered questions patiently",
+          "service felt genuine",
+          "team was easy to work with",
+          "they guided us properly",
+          "support was helpful"
+        ],
+        "setup_and_usability": [
+          "app setup was simple",
+          "live view is easy to check",
+          "playback is easy to review",
+          "system is easy to use",
+          "mobile access works well",
+          "checking footage is simple",
+          "controls are easy to understand",
+          "daily use feels easy",
+          "remote viewing is convenient",
+          "setup was explained in a simple way"
+        ],
+        "system_quality": [
+          "video is clear",
+          "night view is clear",
+          "camera angles are useful",
+          "important areas are covered well",
+          "recording looks sharp",
+          "feed stays steady",
+          "coverage feels balanced",
+          "camera placement makes sense",
+          "image is clear in day and night",
+          "blind spots were handled well"
+        ],
+        "security_and_convenience": [
+          "monitoring feels easier now",
+          "it helps us keep an eye on key areas",
+          "checking activity is easier now",
+          "it is useful when away from the place",
+          "important spots are easier to watch",
+          "day to day monitoring is simpler",
+          "it helps with regular checks",
+          "we can review things quickly when needed",
+          "it makes routine monitoring easier",
+          "access to footage is convenient"
+        ],
+        "support_and_value": [
+          "testing was done properly",
+          "setup worked as explained",
+          "handover was smooth",
+          "support after installation was helpful",
+          "they responded when we had questions",
+          "pricing felt reasonable",
+          "service felt worth it",
+          "follow-up support was decent",
+          "everything worked from day one",
+          "overall it felt like a practical setup"
+        ]
+      }
+    },
+    "Wireless Intrusion Alarm System": {
+      "focus_categories": {
+        "installation": [
+          "alarm setup was done neatly",
+          "installation was smooth",
+          "sensor fitting was proper",
+          "work finished on time",
+          "setup did not create much disturbance",
+          "alarm installation was handled carefully",
+          "team worked in an organized way",
+          "installation felt well managed",
+          "setup was completed properly",
+          "everything was fitted cleanly"
+        ],
+        "team_experience": [
+          "team explained the alarm clearly",
+          "staff were polite",
+          "technicians guided us well",
+          "questions were answered properly",
+          "service felt easy to deal with",
+          "they understood our requirement",
+          "support was responsive",
+          "communication stayed clear",
+          "the team was patient",
+          "they helped us understand the system"
+        ],
+        "setup_and_usability": [
+          "arming and disarming is easy",
+          "app setup was simple",
+          "alerts are easy to understand",
+          "the system is easy to use",
+          "controls are simple",
+          "settings are easy to manage",
+          "daily use feels straightforward",
+          "phone alerts work properly",
+          "remote access is useful",
+          "the alarm was explained in a simple way"
+        ],
+        "system_quality": [
+          "alerts come quickly",
+          "alarm response feels reliable",
+          "sensor coverage makes sense",
+          "wireless connection stays steady",
+          "the system reacts properly",
+          "the siren is effective",
+          "performance has been stable",
+          "sensor response is quick",
+          "alerts are timely",
+          "the setup feels dependable"
+        ],
+        "coverage_and_security": [
+          "entry points are covered well",
+          "important areas feel better protected",
+          "sensor placement was planned properly",
+          "it helps us monitor access better",
+          "coverage feels balanced",
+          "the setup suits the space well",
+          "it helps with regular security checks",
+          "key spots are easier to watch",
+          "the system feels useful in daily use",
+          "it adds another useful layer of protection"
+        ],
+        "support_and_value": [
+          "testing was done properly",
+          "support after setup was helpful",
+          "they responded when needed",
+          "pricing felt reasonable",
+          "service felt practical",
+          "follow-up was decent",
+          "setup worked as explained",
+          "handover was smooth",
+          "everything was checked before leaving",
+          "overall the setup felt worth doing"
+        ]
+      }
+    },
+    "Video Door Phone": {
+      "focus_categories": {
+        "installation": [
+          "device fitting was neat",
+          "installation was smooth",
+          "setup finished on time",
+          "work was done cleanly",
+          "fitting was handled properly",
+          "installation did not cause much disturbance",
+          "setup felt organized",
+          "team managed the work well",
+          "everything was installed carefully",
+          "the final setup looked clean"
+        ],
+        "team_experience": [
+          "team explained the system clearly",
+          "staff were polite",
+          "questions were answered properly",
+          "guidance was helpful",
+          "communication was easy",
+          "the team knew what would work",
+          "support felt genuine",
+          "they were easy to deal with",
+          "they explained usage clearly",
+          "the team handled things patiently"
+        ],
+        "setup_and_usability": [
+          "visitor view is easy to check",
+          "app access is simple",
+          "using the system feels easy",
+          "controls are easy to understand",
+          "call handling is simple",
+          "phone connection works well",
+          "daily use feels straightforward",
+          "features were explained clearly",
+          "remote access is useful",
+          "the setup is easy for everyday use"
+        ],
+        "system_quality": [
+          "video is clear",
+          "audio is clear",
+          "call quality is smooth",
+          "visitor view is sharp",
+          "notifications come properly",
+          "the device responds quickly",
+          "performance has been steady",
+          "video feed stays stable",
+          "speaker and mic are clear",
+          "overall output feels reliable"
+        ],
+        "security_and_convenience": [
+          "it is easier to check visitors now",
+          "entrance monitoring feels simpler",
+          "it helps before opening the door",
+          "visitor handling is more convenient",
+          "checking from the phone is useful",
+          "the entrance area is easier to monitor",
+          "it helps with daily visitor checks",
+          "remote viewing is practical",
+          "it makes entry handling easier",
+          "it is useful in everyday use"
+        ],
+        "support_and_value": [
+          "testing was done properly",
+          "support after installation was helpful",
+          "pricing felt reasonable",
+          "service felt worth it",
+          "handover was smooth",
+          "setup worked as explained",
+          "they responded when needed",
+          "follow-up support was decent",
+          "everything was checked properly",
+          "overall the setup felt practical"
+        ]
+      }
+    },
+    "Intercom System": {
+      "focus_categories": {
+        "installation": [
+          "installation was neat",
+          "fitting was done properly",
+          "setup finished on time",
+          "work was handled cleanly",
+          "installation felt organized",
+          "team managed the setup well",
+          "there was not much disturbance during work",
+          "everything was installed carefully",
+          "the final setup looked clean",
+          "the work was completed smoothly"
+        ],
+        "team_experience": [
+          "team explained the system clearly",
+          "staff were polite",
+          "guidance during setup was helpful",
+          "communication was easy",
+          "questions were answered properly",
+          "they understood the requirement well",
+          "support felt genuine",
+          "the team was patient",
+          "they were easy to deal with",
+          "the process felt well handled"
+        ],
+        "setup_and_usability": [
+          "the intercom is easy to use",
+          "controls are simple",
+          "communication is easy now",
+          "daily use feels straightforward",
+          "the setup was explained clearly",
+          "features are easy to understand",
+          "using it every day feels simple",
+          "call handling is convenient",
+          "the system is easy for staff to use",
+          "it does not take time to understand"
+        ],
+        "system_quality": [
+          "audio is clear",
+          "voice stays clear during calls",
+          "communication between points is smooth",
+          "sound output is reliable",
+          "performance has been steady",
+          "the system responds properly",
+          "call quality is consistent",
+          "voice clarity is good",
+          "the intercom works without confusion",
+          "overall output feels reliable"
+        ],
+        "security_and_convenience": [
+          "communication inside the place is easier now",
+          "visitor handling feels smoother",
+          "entry communication is more convenient",
+          "it helps with day to day coordination",
+          "the setup is useful in regular use",
+          "important communication points are easier to manage",
+          "it saves time in daily communication",
+          "it helps staff coordinate better",
+          "it makes routine communication easier",
+          "the system feels practical for daily use"
+        ],
+        "support_and_value": [
+          "testing was done properly",
+          "support after setup was helpful",
+          "pricing felt reasonable",
+          "service felt worth it",
+          "handover was smooth",
+          "everything worked as explained",
+          "follow-up support was decent",
+          "the team responded when needed",
+          "the setup was checked properly before leaving",
+          "overall it felt like a practical system"
+        ]
+      }
+    }
+  }
+}

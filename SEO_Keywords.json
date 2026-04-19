@@ -1,0 +1,62 @@
+{
+  "services": {
+    "CCTV Installation": [
+      "CCTV installation",
+      "CCTV setup",
+      "CCTV camera setup",
+      "CCTV system setup",
+      "camera installation",
+      "security camera installation",
+      "surveillance camera installation",
+      "video surveillance setup",
+      "video surveillance installation",
+      "CCTV camera service",
+      "surveillance setup",
+      "camera setup service",
+      "CCTV monitoring setup",
+      "day and night camera setup",
+      "remote viewing setup",
+      "camera coverage setup"
+    ],
+    "Wireless Intrusion Alarm System": [
+      "alarm system installation",
+      "intrusion alarm setup",
+      "intrusion alarm installation",
+      "wireless alarm setup",
+      "wireless alarm installation",
+      "security alarm setup",
+      "security alarm installation",
+      "burglar alarm setup",
+      "burglar alarm installation",
+      "alarm service",
+      "alarm monitoring setup",
+      "sensor alarm setup",
+      "entry alarm setup"
+    ],
+    "Video Door Phone": [
+      "video door phone installation",
+      "video door phone setup",
+      "door phone installation",
+      "door phone setup",
+      "smart doorbell setup",
+      "video doorbell installation",
+      "entrance video setup",
+      "video entry setup",
+      "door phone service"
+    ],
+    "Intercom System": [
+      "intercom system installation",
+      "intercom setup",
+      "intercom service",
+      "audio intercom setup",
+      "video intercom setup",
+      "office intercom setup",
+      "home intercom setup",
+      "building intercom setup",
+      "apartment intercom setup",
+      "intercom communication setup",
+      "entrance intercom setup",
+      "internal communication setup"
+    ]
+  }
+}

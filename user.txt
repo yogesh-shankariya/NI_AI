@@ -1,0 +1,37 @@
+Service: {{selected_service}}
+Area: {{area}}
+Subarea: {{subarea}}
+Property Type: {{property_type}}
+Number of Cameras: {{number_of_cameras}}
+Camera Brand: {{camera_brand}}
+
+SEO Keyword: {{seo_keyword}}
+Focus 1: {{focus_1}}
+Focus 2: {{focus_2}}
+
+Tone Rule: {{tone_rule}}
+Perspective Rule: {{perspective_rule}}
+Property and Location Rule: {{property_location_rule}}
+Company Name Rule: {{company_name_rule}}
+Avoid Words Rule: {{avoid_words_rule}}
+
+Recent Generated Reviews:
+{{recent_reviews_block}}
+
+Maximum Characters: {{review_char_limit}}
+
+Write one short review.
+
+Rules:
+- Use the SEO keyword naturally
+- Use Focus 1 and Focus 2 naturally
+- Keep the review clearly relevant to the selected service and property type
+- Keep the wording different from the recent generated reviews
+- Do not repeat similar opening, phrasing, sentence flow, or closing style
+- Follow the tone rule
+- Follow the perspective rule, especially the opening wording
+- Follow the property and location rule
+- Follow the company name rule
+- Follow the avoid words rule
+- Keep it natural and human-like
+- Keep it within the maximum character limit
