@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 import traceback
 import urllib.error
 import urllib.parse
@@ -161,10 +162,22 @@ def validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
-    values = validate_payload(payload)
-    state = reserve_state(values["service"])
-    recent_reviews = fetch_recent_reviews(values["service"])
+    total_start = time.perf_counter()
+    timings_ms: dict[str, int] = {}
 
+    step_start = time.perf_counter()
+    values = validate_payload(payload)
+    timings_ms["validate"] = round((time.perf_counter() - step_start) * 1000)
+
+    step_start = time.perf_counter()
+    state = reserve_state(values["service"])
+    timings_ms["reserve_state"] = round((time.perf_counter() - step_start) * 1000)
+
+    step_start = time.perf_counter()
+    recent_reviews = fetch_recent_reviews(values["service"])
+    timings_ms["fetch_recent_reviews"] = round((time.perf_counter() - step_start) * 1000)
+
+    step_start = time.perf_counter()
     result = generate_review_from_state(
         base_dir=ROOT_DIR,
         selected_service=values["service"],
@@ -178,6 +191,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
         recent_reviews=recent_reviews,
         api_key=get_required_env("OPENAI_API_KEY"),
     )
+    timings_ms["openai_generate"] = round((time.perf_counter() - step_start) * 1000)
 
     selected_inputs = result["selected_inputs"]
     history_payload = {
@@ -193,7 +207,12 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
         "review": result["review"],
         "similarity": result["similarity"],
     }
+    step_start = time.perf_counter()
     save_review_history(history_payload)
+    timings_ms["save_review_history"] = round((time.perf_counter() - step_start) * 1000)
+    timings_ms["total"] = round((time.perf_counter() - total_start) * 1000)
+
+    print("generate_review timings_ms=" + json.dumps(timings_ms, sort_keys=True))
 
     return {
         "review": result["review"],
@@ -202,7 +221,18 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
             "focus_1": selected_inputs["focus_1"],
             "focus_2": selected_inputs["focus_2"],
             "perspective_rule": selected_inputs["perspective_rule"],
+            "timings_ms": timings_ms,
         },
+    }
+
+
+def health_check() -> dict[str, Any]:
+    start = time.perf_counter()
+    rows = supabase_request("GET", "service_state?select=service&limit=1")
+    return {
+        "ok": True,
+        "supabase": isinstance(rows, list),
+        "elapsed_ms": round((time.perf_counter() - start) * 1000),
     }
 
 
@@ -235,6 +265,14 @@ class handler(BaseHTTPRequestHandler):
             self.send_json(200, response)
 
     def do_GET(self) -> None:
+        if self.path.startswith("/api/health"):
+            try:
+                self.send_json(200, health_check())
+            except Exception as exc:
+                print(traceback.format_exc())
+                self.send_json(500, {"ok": False, "error": str(exc)})
+            return
+
         self.send_json(200, {"ok": True})
 
     def send_common_headers(self) -> None:
