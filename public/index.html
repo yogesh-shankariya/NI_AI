@@ -123,6 +123,9 @@ textarea {
     <label for="propertyType">Property Type</label>
     <select id="propertyType" name="propertyType" required></select>
 
+    <label for="reviewCharLimit">Review Length (Characters)</label>
+    <select id="reviewCharLimit" name="reviewCharLimit" required></select>
+
     <div id="cameraCountField">
       <label for="numberOfCameras">Number of Cameras</label>
       <input type="number" id="numberOfCameras" name="numberOfCameras" min="1" step="1" inputmode="numeric" placeholder="Example: 8">
@@ -145,6 +148,7 @@ textarea {
 <script>
 const SERVICE_OPTIONS = [
   "CCTV Installation",
+  "CCTV Camera",
   "Wireless Intrusion Alarm System",
   "Video Door Phone",
   "Intercom System"
@@ -240,6 +244,8 @@ const PROPERTY_TYPE_OPTIONS = [
   "coaching center",
   "hostel",
   "apartment complex",
+  "residency",
+  "commercial complex",
   "farmhouse",
   "godown",
   "restaurant",
@@ -247,7 +253,12 @@ const PROPERTY_TYPE_OPTIONS = [
   "property"
 ];
 
-const CCTV_SERVICE = "CCTV Installation";
+const CAMERA_DETAIL_SERVICES = [
+  "CCTV Installation",
+  "CCTV Camera"
+];
+const REVIEW_CHAR_LIMIT_OPTIONS = [100, 200, 300, 400];
+const DEFAULT_REVIEW_CHAR_LIMIT = "400";
 
 function populateSelect(selectId, options) {
   const select = document.getElementById(selectId);
@@ -272,7 +283,7 @@ function updateCameraFields() {
   const cameraCountField = document.getElementById("cameraCountField");
   const numberOfCameras = document.getElementById("numberOfCameras");
 
-  if (service === CCTV_SERVICE) {
+  if (CAMERA_DETAIL_SERVICES.includes(service)) {
     cameraCountField.classList.remove("hidden");
   } else {
     cameraCountField.classList.add("hidden");
@@ -301,10 +312,11 @@ async function generateReview() {
   const area = document.getElementById("area").value;
   const subarea = document.getElementById("subarea").value;
   const propertyType = document.getElementById("propertyType").value;
+  const reviewCharLimit = document.getElementById("reviewCharLimit").value;
   const numberOfCameras = document.getElementById("numberOfCameras").value.trim();
   const cameraBrand = document.getElementById("cameraBrand").value.trim();
 
-  if (service === CCTV_SERVICE && numberOfCameras !== "" && !/^[1-9][0-9]*$/.test(numberOfCameras)) {
+  if (CAMERA_DETAIL_SERVICES.includes(service) && numberOfCameras !== "" && !/^[1-9][0-9]*$/.test(numberOfCameras)) {
     alert("Number of cameras must be a whole number.");
     return;
   }
@@ -314,7 +326,8 @@ async function generateReview() {
     area: area,
     subarea: subarea,
     property_type: propertyType,
-    number_of_cameras: service === CCTV_SERVICE ? numberOfCameras : "",
+    review_char_limit: Number(reviewCharLimit),
+    number_of_cameras: CAMERA_DETAIL_SERVICES.includes(service) ? numberOfCameras : "",
     camera_brand: cameraBrand
   };
 
@@ -361,6 +374,8 @@ document.getElementById("service").addEventListener("change", updateCameraFields
 populateSelect("service", SERVICE_OPTIONS);
 populateSelect("area", Object.keys(LOCATION_DATA));
 populateSelect("propertyType", PROPERTY_TYPE_OPTIONS);
+populateSelect("reviewCharLimit", REVIEW_CHAR_LIMIT_OPTIONS);
+document.getElementById("reviewCharLimit").value = DEFAULT_REVIEW_CHAR_LIMIT;
 populateSubareas();
 updateCameraFields();
 </script>

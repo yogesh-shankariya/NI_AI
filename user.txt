@@ -20,6 +20,7 @@ Recent Generated Reviews:
 {{recent_reviews_block}}
 
 Maximum Characters: {{review_char_limit}}
+Character Limit Rule: {{character_limit_rule}}
 
 Write one short review.
 
@@ -35,5 +36,7 @@ Rules:
 - Follow the property and location rule
 - Follow the company name rule
 - Follow the avoid words rule
+- Follow the character limit rule exactly
+- Do not use words like practical, sensible, practically, or sensibly
 - Keep it natural and human-like
-- Keep it within the maximum character limit
+- Keep it within the maximum character limit, counting spaces and punctuation

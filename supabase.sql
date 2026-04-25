@@ -124,6 +124,7 @@ grant usage, select on sequence public.review_history_id_seq to service_role;
 insert into public.service_state (service)
 values
   ('CCTV Installation'),
+  ('CCTV Camera'),
   ('Wireless Intrusion Alarm System'),
   ('Video Door Phone'),
   ('Intercom System')

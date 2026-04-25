@@ -17,11 +17,17 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from main import CACHE_LIMIT, generate_review_from_state, load_json  # noqa: E402
+from main import (  # noqa: E402
+    CACHE_LIMIT,
+    CAMERA_DETAIL_SERVICES,
+    DEFAULT_REVIEW_CHAR_LIMIT,
+    generate_review_from_state,
+    load_json,
+    normalize_review_char_limit,
+)
 
 
 MAX_BODY_BYTES = 10_000
-REVIEW_CHAR_LIMIT = 400
 
 
 def clean_text(value: Any, max_length: int = 120) -> str:
@@ -135,9 +141,14 @@ def validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
     subarea = clean_text(payload.get("subarea"))
     property_type = clean_text(payload.get("property_type") or payload.get("propertyType"))
     camera_brand = clean_text(payload.get("camera_brand") or payload.get("cameraBrand"), max_length=80)
-    number_of_cameras = parse_optional_camera_count(
-        payload.get("number_of_cameras") or payload.get("numberOfCameras")
-    )
+    raw_number_of_cameras = payload.get("number_of_cameras")
+    if raw_number_of_cameras is None:
+        raw_number_of_cameras = payload.get("numberOfCameras")
+    number_of_cameras = parse_optional_camera_count(raw_number_of_cameras)
+    raw_review_char_limit = payload.get("review_char_limit")
+    if raw_review_char_limit is None:
+        raw_review_char_limit = payload.get("reviewCharLimit")
+    review_char_limit = normalize_review_char_limit(raw_review_char_limit)
 
     if service not in service_data["services"]:
         raise ValueError("Please select a valid service.")
@@ -147,7 +158,7 @@ def validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Please select a valid subarea.")
     if property_type not in property_type_data:
         raise ValueError("Please select a valid property type.")
-    if service != "CCTV Installation":
+    if service not in CAMERA_DETAIL_SERVICES:
         number_of_cameras = None
         camera_brand = ""
 
@@ -158,6 +169,7 @@ def validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "property_type": property_type,
         "number_of_cameras": number_of_cameras,
         "camera_brand": camera_brand,
+        "review_char_limit": review_char_limit,
     }
 
 
@@ -186,7 +198,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
         property_type=values["property_type"],
         number_of_cameras=values["number_of_cameras"],
         camera_brand=values["camera_brand"],
-        review_char_limit=REVIEW_CHAR_LIMIT,
+        review_char_limit=values.get("review_char_limit", DEFAULT_REVIEW_CHAR_LIMIT),
         state=state,
         recent_reviews=recent_reviews,
         api_key=get_required_env("OPENAI_API_KEY"),
@@ -194,8 +206,13 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
     timings_ms["openai_generate"] = round((time.perf_counter() - step_start) * 1000)
 
     selected_inputs = result["selected_inputs"]
+    history_values = {
+        key: value
+        for key, value in values.items()
+        if key != "review_char_limit"
+    }
     history_payload = {
-        **values,
+        **history_values,
         "seo_keyword": selected_inputs["seo_keyword"],
         "focus_1": selected_inputs["focus_1"],
         "focus_2": selected_inputs["focus_2"],
@@ -222,6 +239,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
             "focus_2": selected_inputs["focus_2"],
             "perspective_rule": selected_inputs["perspective_rule"],
             "review_structure_rule": selected_inputs["review_structure_rule"],
+            "review_char_limit": values["review_char_limit"],
             "timings_ms": timings_ms,
         },
     }

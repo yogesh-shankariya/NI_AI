@@ -21,13 +21,19 @@ REASONING = {"effort": "none"}
 CACHE_LIMIT = 10
 MAX_RETRY = 3
 SIMILARITY_THRESHOLD = 0.88
+BANNED_CUSTOMER_REVIEW_WORDS = ("practical", "practically", "sensible", "sensibly")
 
 SERVICE_STATE_FILES = {
     "CCTV Installation": "cctv_installation.json",
+    "CCTV Camera": "cctv_camera.json",
     "Wireless Intrusion Alarm System": "wireless_intrusion_alarm_system.json",
     "Video Door Phone": "video_door_phone.json",
     "Intercom System": "intercom_system.json",
 }
+
+CAMERA_DETAIL_SERVICES = {"CCTV Installation", "CCTV Camera"}
+REVIEW_CHAR_LIMIT_OPTIONS = (100, 200, 300, 400)
+DEFAULT_REVIEW_CHAR_LIMIT = 400
 
 PROPERTY_LOCATION_RULES = [
     "Mention the property type naturally in the middle of the first sentence and skip location completely.",
@@ -45,7 +51,7 @@ PROPERTY_LOCATION_RULES = [
 REVIEW_STRUCTURE_RULES = [
     "Use a property-first structure. Start from the property/use case context, then connect it to the service result. Do not start with I had, I got, We had, or We got.",
     "Use a service-first structure. Start from the selected service work, then mention the property type and focus points naturally.",
-    "Use a result-first structure. Start with the practical outcome or improvement, then explain the service experience.",
+    "Use a result-first structure. Start with the clear outcome or improvement, then explain the service experience.",
     "Use a team/process-first structure. Start with how the team handled checking, planning, installation, setup, or explanation.",
     "Use a location-and-company structure. If the company and location rules ask for them, include both naturally once without making the sentence sound like an ad.",
     "Use a detail-first structure. Start with a concrete service detail such as wiring, setup, coverage, configuration, explanation, or handover.",
@@ -71,7 +77,7 @@ DEFAULT_STATE = {
 
 TONE_RULES = [
     "Use a plain positive tone.",
-    "Use a practical customer tone.",
+    "Use a simple customer tone.",
     "Use a warm positive tone.",
     "Use a confident but natural tone.",
     "Use a service-focused positive tone.",
@@ -131,6 +137,18 @@ def load_schema(schema_path: Path):
     return module.ReviewResponse
 
 
+def load_review_schema(schema_path: Path, review_char_limit: int):
+    spec = importlib.util.spec_from_file_location("review_schema_module", schema_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load schema from {schema_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if hasattr(module, "make_review_response_model"):
+        return module.make_review_response_model(review_char_limit)
+    return module.ReviewResponse
+
+
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -173,6 +191,66 @@ def render_prompt(template: str, values: dict[str, Any]) -> str:
         raise KeyError(f"Missing prompt values for: {missing}")
 
     return PLACEHOLDER_PATTERN.sub(lambda match: str(values[match.group(1)]), template)
+
+
+def normalize_review_char_limit(value: Any) -> int:
+    if value is None or str(value).strip() == "":
+        return DEFAULT_REVIEW_CHAR_LIMIT
+
+    try:
+        limit = int(str(value).strip())
+    except ValueError as exc:
+        allowed = ", ".join(str(option) for option in REVIEW_CHAR_LIMIT_OPTIONS)
+        raise ValueError(f"Review length must be one of {allowed} characters.") from exc
+
+    if limit not in REVIEW_CHAR_LIMIT_OPTIONS:
+        allowed = ", ".join(str(option) for option in REVIEW_CHAR_LIMIT_OPTIONS)
+        raise ValueError(f"Review length must be one of {allowed} characters.")
+
+    return limit
+
+
+def get_character_limit_rule(review_char_limit: int) -> str:
+    if review_char_limit == 100:
+        return (
+            "Treat Maximum Characters as a hard cap including spaces and punctuation. "
+            "Write one very short sentence and prioritize the service, property type, and one clear result."
+        )
+    if review_char_limit == 200:
+        return (
+            "Treat Maximum Characters as a hard cap including spaces and punctuation. "
+            "Write one or two compact sentences without extra explanation."
+        )
+    if review_char_limit == 300:
+        return (
+            "Treat Maximum Characters as a hard cap including spaces and punctuation. "
+            "Write two natural sentences only if they fit comfortably."
+        )
+    return (
+        "Treat Maximum Characters as a hard cap including spaces and punctuation. "
+        "Keep the review short, natural, and comfortably within the selected limit."
+    )
+
+
+def trim_review_to_limit(text: str, review_char_limit: int) -> str:
+    normalized = " ".join(text.split())
+    if len(normalized) <= review_char_limit:
+        return normalized
+
+    sentences = re.split(r"(?<=[.!?])\s+", normalized)
+    candidate = ""
+    for sentence in sentences:
+        next_candidate = sentence if not candidate else f"{candidate} {sentence}"
+        if len(next_candidate) <= review_char_limit:
+            candidate = next_candidate
+
+    if candidate:
+        return candidate
+
+    truncated = normalized[:review_char_limit].rstrip()
+    if " " in truncated:
+        truncated = truncated.rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return truncated or normalized[:review_char_limit]
 
 
 def build_recent_reviews_block(recent_reviews: list[str]) -> str:
@@ -255,6 +333,13 @@ def max_similarity_against_history(text: str, history: list[str]) -> float:
     return max(similarity_score(text, h) for h in history)
 
 
+def has_banned_customer_review_word(text: str) -> bool:
+    return any(
+        re.search(rf"\b{re.escape(word)}\b", text, flags=re.IGNORECASE)
+        for word in BANNED_CUSTOMER_REVIEW_WORDS
+    )
+
+
 def extract_parsed_response(response):
     parsed = getattr(response, "output_parsed", None)
     if parsed is not None:
@@ -302,6 +387,8 @@ def generate_review_from_state(
     recent_reviews: list[str] | None = None,
     api_key: str | None = None,
 ) -> dict[str, Any]:
+    review_char_limit = normalize_review_char_limit(review_char_limit)
+
     if selected_service not in SERVICE_STATE_FILES:
         raise ValueError(
             f"Unsupported service '{selected_service}'. Allowed values: {list(SERVICE_STATE_FILES.keys())}"
@@ -313,7 +400,7 @@ def generate_review_from_state(
     seo_path = base_dir / "SEO_Keywords.json"
     service_path = base_dir / "Service_Keywords.json"
 
-    ReviewResponse = load_schema(schema_path)
+    ReviewResponse = load_review_schema(schema_path, review_char_limit)
 
     system_prompt = system_path.read_text(encoding="utf-8").strip()
     user_template = user_path.read_text(encoding="utf-8")
@@ -325,7 +412,7 @@ def generate_review_from_state(
     selected_inputs = get_next_inputs(selected_service, normalized_state, seo_data, service_data)
     recent_reviews = list(recent_reviews or normalized_state["recent_reviews"])
 
-    use_camera_fields = selected_service == "CCTV Installation"
+    use_camera_fields = selected_service in CAMERA_DETAIL_SERVICES
 
     prompt_variables = {
         "selected_service": selected_service,
@@ -343,6 +430,7 @@ def generate_review_from_state(
         "property_location_rule": selected_inputs["property_location_rule"],
         "company_name_rule": selected_inputs["company_name_rule"],
         "avoid_words_rule": selected_inputs["avoid_words_rule"],
+        "character_limit_rule": get_character_limit_rule(review_char_limit),
         "recent_reviews_block": build_recent_reviews_block(recent_reviews),
         "review_char_limit": review_char_limit,
     }
@@ -352,6 +440,7 @@ def generate_review_from_state(
 
     best_review = None
     best_similarity = None
+    best_over_limit_review = None
 
     for attempt in range(1, MAX_RETRY + 1):
         user_prompt = base_user_prompt
@@ -359,7 +448,9 @@ def generate_review_from_state(
             user_prompt += (
                 "\n\nExtra instruction:\n"
                 "Make this output more different from the recent generated reviews. "
-                "Use a different opening and different sentence flow."
+                "Use a different opening and different sentence flow. "
+                f"Keep the final review at or under {review_char_limit} characters. "
+                "Do not use practical, sensible, practically, or sensibly."
             )
 
         response = client.responses.parse(
@@ -375,17 +466,27 @@ def generate_review_from_state(
 
         parsed = extract_parsed_response(response)
         review_text = parsed["response"] if isinstance(parsed, dict) else parsed.response
+        review_text = " ".join(review_text.split())
         similarity = max_similarity_against_history(review_text, recent_reviews)
+        is_within_limit = len(review_text) <= review_char_limit
+        has_banned_word = has_banned_customer_review_word(review_text)
 
-        if best_review is None or similarity < best_similarity:
+        if is_within_limit and not has_banned_word and (best_review is None or similarity < best_similarity):
             best_review = review_text
             best_similarity = similarity
+        elif not has_banned_word and not is_within_limit and (
+            best_over_limit_review is None or len(review_text) < len(best_over_limit_review)
+        ):
+            best_over_limit_review = review_text
 
-        if similarity < SIMILARITY_THRESHOLD:
+        if is_within_limit and not has_banned_word and similarity < SIMILARITY_THRESHOLD:
             break
 
     if best_review is None:
-        raise ValueError("Could not generate review.")
+        if best_over_limit_review is None:
+            raise ValueError("Could not generate review.")
+        best_review = trim_review_to_limit(best_over_limit_review, review_char_limit)
+        best_similarity = max_similarity_against_history(best_review, recent_reviews)
 
     return {
         "review": best_review,
@@ -467,6 +568,13 @@ def parse_optional_int(value: str | None) -> int | None:
         raise argparse.ArgumentTypeError(f"expected an integer or blank value, got {value!r}") from exc
 
 
+def parse_review_char_limit(value: str | None) -> int:
+    try:
+        return normalize_review_char_limit(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate one Nilkanth Infotech review from CLI")
 
@@ -484,7 +592,12 @@ def parse_args() -> argparse.Namespace:
         help="Number of cameras",
     )
     parser.add_argument("--camera-brand", nargs="?", const="", default="", help="Camera brand")
-    parser.add_argument("--review-char-limit", type=int, default=400, help="Maximum review length")
+    parser.add_argument(
+        "--review-char-limit",
+        type=parse_review_char_limit,
+        default=DEFAULT_REVIEW_CHAR_LIMIT,
+        help="Maximum review length. Allowed values: 100, 200, 300, 400",
+    )
     parser.add_argument("--show-prompt-preview", action="store_true", help="Print system and user prompts before generation")
     parser.add_argument("--show-meta", action="store_true", help="Print used state/rotation metadata")
 

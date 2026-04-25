@@ -72,7 +72,83 @@
           "service felt worth it",
           "follow-up support was decent",
           "everything worked from day one",
-          "overall it felt like a practical setup"
+          "overall the setup worked well"
+        ]
+      }
+    },
+    "CCTV Camera": {
+      "focus_categories": {
+        "camera_selection": [
+          "camera choice suited the place",
+          "right camera type was suggested",
+          "camera options were explained clearly",
+          "camera selection felt right",
+          "they suggested cameras as per the area",
+          "camera requirement was understood properly",
+          "the camera choice matched our need",
+          "they guided us on the right camera model",
+          "camera planning was done properly",
+          "the suggested cameras fit the space well"
+        ],
+        "team_experience": [
+          "team explained things clearly",
+          "staff were polite",
+          "technicians knew the product well",
+          "communication was easy",
+          "team understood what was needed",
+          "they answered questions patiently",
+          "service felt genuine",
+          "team was easy to work with",
+          "they guided us properly",
+          "support was helpful"
+        ],
+        "setup_and_usability": [
+          "app access is simple",
+          "live view is easy to check",
+          "playback is easy to review",
+          "system use feels simple",
+          "mobile viewing works well",
+          "checking footage is convenient",
+          "controls are easy to understand",
+          "daily use feels easy",
+          "remote viewing is useful",
+          "camera use was explained in a simple way"
+        ],
+        "system_quality": [
+          "video clarity is sharp",
+          "night view is clear",
+          "camera angles are useful",
+          "important areas are covered well",
+          "recording quality looks clear",
+          "feed stays steady",
+          "coverage feels balanced",
+          "camera output looks reliable",
+          "image is clear in day and night",
+          "blind spots were considered well"
+        ],
+        "security_and_convenience": [
+          "monitoring feels easier now",
+          "it helps us keep an eye on key areas",
+          "checking activity is easier now",
+          "it is useful when away from the place",
+          "important spots are easier to watch",
+          "day to day monitoring is simpler",
+          "it helps with regular checks",
+          "we can review things quickly when needed",
+          "it makes routine monitoring easier",
+          "access to footage is convenient"
+        ],
+        "support_and_value": [
+          "camera testing was done properly",
+          "camera performance matched what was explained",
+          "handover was smooth",
+          "support after setup was helpful",
+          "they responded when we had questions",
+          "pricing felt reasonable",
+          "service felt worth it",
+          "follow-up support was decent",
+          "everything worked from day one",
+          "overall the camera setup worked well"
         ]
       }
     },
@@ -143,7 +219,7 @@
           "support after setup was helpful",
           "they responded when needed",
           "pricing felt reasonable",
-          "service felt practical",
+          "service felt useful",
           "follow-up was decent",
           "setup worked as explained",
           "handover was smooth",
@@ -210,7 +286,7 @@
           "checking from the phone is useful",
           "the entrance area is easier to monitor",
           "it helps with daily visitor checks",
-          "remote viewing is practical",
+          "remote viewing is useful",
           "it makes entry handling easier",
           "it is useful in everyday use"
         ],
@@ -224,7 +300,7 @@
           "they responded when needed",
           "follow-up support was decent",
           "everything was checked properly",
-          "overall the setup felt practical"
+          "overall the setup worked well"
         ]
       }
     },
@@ -288,7 +364,7 @@
           "it saves time in daily communication",
           "it helps staff coordinate better",
           "it makes routine communication easier",
-          "the system feels practical for daily use"
+          "the system is useful in daily use"
         ],
         "support_and_value": [
           "testing was done properly",
@@ -300,7 +376,7 @@
           "follow-up support was decent",
           "the team responded when needed",
           "the setup was checked properly before leaving",
-          "overall it felt like a practical system"
+          "overall the system works well"
         ]
       }
     }
