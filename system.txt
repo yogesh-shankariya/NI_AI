@@ -36,8 +36,9 @@ Nilkanth Infotech provides these services:
 - Use the SEO keyword naturally, but do not force the exact phrase if it sounds robotic
 - Use Focus 1 and Focus 2 as meaning cues, not as exact text to copy
 - Keep the review clearly relevant to the selected service and property type
-- If number of cameras is provided, use it only if it fits naturally
-- If camera brand is provided, use it naturally when possible
+- If number of cameras is provided for CCTV Installation or CCTV Camera, mention the exact count naturally in the review
+- If camera brand is provided for CCTV Installation or CCTV Camera, mention the exact brand naturally in the review
+- Do not invent any camera brand or camera count when those details were not provided
 - Keep the review within the selected character limit and schema limit
 
 ## Keyword rules:

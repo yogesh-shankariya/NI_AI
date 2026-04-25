@@ -15,6 +15,7 @@ Review Structure Rule: {{review_structure_rule}}
 Property and Location Rule: {{property_location_rule}}
 Company Name Rule: {{company_name_rule}}
 Avoid Words Rule: {{avoid_words_rule}}
+Camera Detail Rule: {{camera_detail_rule}}
 
 Recent Generated Reviews:
 {{recent_reviews_block}}
@@ -36,6 +37,7 @@ Rules:
 - Follow the property and location rule
 - Follow the company name rule
 - Follow the avoid words rule
+- Follow the camera detail rule exactly
 - Follow the character limit rule exactly
 - Do not use words like practical, sensible, practically, or sensibly
 - Keep it natural and human-like

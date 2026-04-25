@@ -131,8 +131,10 @@ textarea {
       <input type="number" id="numberOfCameras" name="numberOfCameras" min="1" step="1" inputmode="numeric" placeholder="Example: 8">
     </div>
 
-    <label for="cameraBrand">Camera Brand</label>
-    <input type="text" id="cameraBrand" name="cameraBrand" placeholder="Example: Hikvision">
+    <div id="cameraBrandField">
+      <label for="cameraBrand">Camera Brand</label>
+      <input type="text" id="cameraBrand" name="cameraBrand" placeholder="Example: Hikvision">
+    </div>
 
     <button type="button" id="generateButton" onclick="generateReview()">Generate Review</button>
 
@@ -281,13 +283,18 @@ function populateSubareas() {
 function updateCameraFields() {
   const service = document.getElementById("service").value;
   const cameraCountField = document.getElementById("cameraCountField");
+  const cameraBrandField = document.getElementById("cameraBrandField");
   const numberOfCameras = document.getElementById("numberOfCameras");
+  const cameraBrand = document.getElementById("cameraBrand");
 
   if (CAMERA_DETAIL_SERVICES.includes(service)) {
     cameraCountField.classList.remove("hidden");
+    cameraBrandField.classList.remove("hidden");
   } else {
     cameraCountField.classList.add("hidden");
+    cameraBrandField.classList.add("hidden");
     numberOfCameras.value = "";
+    cameraBrand.value = "";
   }
 }
 

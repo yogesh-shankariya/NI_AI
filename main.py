@@ -232,6 +232,28 @@ def get_character_limit_rule(review_char_limit: int) -> str:
     )
 
 
+def get_camera_detail_rule(
+    selected_service: str,
+    number_of_cameras: int | None,
+    camera_brand: str,
+) -> str:
+    if selected_service not in CAMERA_DETAIL_SERVICES:
+        return "Do not mention any camera count or camera brand."
+
+    has_count = number_of_cameras is not None
+    has_brand = bool(camera_brand.strip())
+
+    if has_count and has_brand:
+        return (
+            "Mention both the exact number of cameras and the exact camera brand naturally in the review."
+        )
+    if has_count:
+        return "Mention the exact number of cameras naturally in the review."
+    if has_brand:
+        return "Mention the exact camera brand naturally in the review."
+    return "Do not invent any camera count or camera brand."
+
+
 def trim_review_to_limit(text: str, review_char_limit: int) -> str:
     normalized = " ".join(text.split())
     if len(normalized) <= review_char_limit:
@@ -340,6 +362,27 @@ def has_banned_customer_review_word(text: str) -> bool:
     )
 
 
+def includes_required_camera_details(
+    text: str,
+    selected_service: str,
+    number_of_cameras: int | None,
+    camera_brand: str,
+) -> bool:
+    if selected_service not in CAMERA_DETAIL_SERVICES:
+        return True
+
+    normalized_text = text.lower()
+
+    if number_of_cameras is not None and str(number_of_cameras) not in text:
+        return False
+
+    brand = camera_brand.strip().lower()
+    if brand and brand not in normalized_text:
+        return False
+
+    return True
+
+
 def extract_parsed_response(response):
     parsed = getattr(response, "output_parsed", None)
     if parsed is not None:
@@ -431,6 +474,11 @@ def generate_review_from_state(
         "company_name_rule": selected_inputs["company_name_rule"],
         "avoid_words_rule": selected_inputs["avoid_words_rule"],
         "character_limit_rule": get_character_limit_rule(review_char_limit),
+        "camera_detail_rule": get_camera_detail_rule(
+            selected_service=selected_service,
+            number_of_cameras=number_of_cameras,
+            camera_brand=camera_brand,
+        ),
         "recent_reviews_block": build_recent_reviews_block(recent_reviews),
         "review_char_limit": review_char_limit,
     }
@@ -450,7 +498,8 @@ def generate_review_from_state(
                 "Make this output more different from the recent generated reviews. "
                 "Use a different opening and different sentence flow. "
                 f"Keep the final review at or under {review_char_limit} characters. "
-                "Do not use practical, sensible, practically, or sensibly."
+                "Do not use practical, sensible, practically, or sensibly. "
+                "Follow the camera detail rule exactly."
             )
 
         response = client.responses.parse(
@@ -470,16 +519,37 @@ def generate_review_from_state(
         similarity = max_similarity_against_history(review_text, recent_reviews)
         is_within_limit = len(review_text) <= review_char_limit
         has_banned_word = has_banned_customer_review_word(review_text)
+        has_required_camera_details = includes_required_camera_details(
+            text=review_text,
+            selected_service=selected_service,
+            number_of_cameras=number_of_cameras,
+            camera_brand=camera_brand,
+        )
 
-        if is_within_limit and not has_banned_word and (best_review is None or similarity < best_similarity):
+        if (
+            is_within_limit
+            and not has_banned_word
+            and has_required_camera_details
+            and (best_review is None or similarity < best_similarity)
+        ):
             best_review = review_text
             best_similarity = similarity
-        elif not has_banned_word and not is_within_limit and (
+        elif (
+            not has_banned_word
+            and has_required_camera_details
+            and not is_within_limit
+            and (
             best_over_limit_review is None or len(review_text) < len(best_over_limit_review)
+            )
         ):
             best_over_limit_review = review_text
 
-        if is_within_limit and not has_banned_word and similarity < SIMILARITY_THRESHOLD:
+        if (
+            is_within_limit
+            and not has_banned_word
+            and has_required_camera_details
+            and similarity < SIMILARITY_THRESHOLD
+        ):
             break
 
     if best_review is None:

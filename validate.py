@@ -103,6 +103,11 @@ def check_prompt_rendering() -> None:
             "property_location_rule": selected_inputs["property_location_rule"],
             "company_name_rule": selected_inputs["company_name_rule"],
             "avoid_words_rule": selected_inputs["avoid_words_rule"],
+            "camera_detail_rule": main.get_camera_detail_rule(
+                selected_service=service_name,
+                number_of_cameras=4 if service_name in main.CAMERA_DETAIL_SERVICES else None,
+                camera_brand="Hikvision" if service_name in main.CAMERA_DETAIL_SERVICES else "",
+            ),
             "character_limit_rule": main.get_character_limit_rule(400),
             "recent_reviews_block": "None",
             "review_char_limit": 400,
