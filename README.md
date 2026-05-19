@@ -15,12 +15,14 @@ Add these in Vercel Project Settings -> Environment Variables:
 
 ```text
 OPENAI_API_KEY=your_openai_key
-SUPABASE_URL=https://ivqwbremiipcunnvlmfp.supabase.co
+SUPABASE_URL=https://adnvphfcywrvuecuiykl.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_secret_key
 ```
 
 If Supabase labels your server-side key as a "secret key", paste that value into
 `SUPABASE_SERVICE_ROLE_KEY`. The frontend never needs the publishable key.
+For the client project, use `https://adnvphfcywrvuecuiykl.supabase.co` as the
+Supabase URL.
 
 Optional after you know your production domain:
 
