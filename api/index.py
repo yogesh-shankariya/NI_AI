@@ -262,6 +262,14 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_HEAD(self) -> None:
+        if urllib.parse.urlparse(self.path).path == "/":
+            index_path = ROOT_DIR / "public" / "index.html"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(index_path.stat().st_size))
+            self.end_headers()
+            return
+
         self.send_response(200)
         self.send_common_headers()
         self.send_header("Content-Length", "0")
@@ -290,7 +298,13 @@ class handler(BaseHTTPRequestHandler):
             self.send_json(200, response)
 
     def do_GET(self) -> None:
-        if self.path.startswith("/api/health"):
+        request_path = urllib.parse.urlparse(self.path).path
+
+        if request_path == "/":
+            self.send_html_file(ROOT_DIR / "public" / "index.html")
+            return
+
+        if request_path.startswith("/api/health"):
             try:
                 self.send_json(200, health_check())
             except Exception as exc:
@@ -304,6 +318,15 @@ class handler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", os.getenv("ALLOWED_ORIGIN", "*"))
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+
+    def send_html_file(self, path: Path) -> None:
+        response_body = path.read_bytes()
+
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(response_body)))
+        self.end_headers()
+        self.wfile.write(response_body)
 
     def send_json(self, status_code: int, data: dict[str, Any]) -> None:
         response_body = json.dumps(data).encode("utf-8")
