@@ -14,7 +14,7 @@ from openai import OpenAI
 
 PLACEHOLDER_PATTERN = re.compile(r"{{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*}}")
 
-MODEL = "gpt-5.4"
+MODEL = "gpt-5.5"
 TEMPERATURE = 2
 REASONING = {"effort": "none"}
 

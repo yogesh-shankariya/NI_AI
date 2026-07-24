@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import sys
 import time
 import traceback
@@ -99,15 +100,40 @@ def supabase_request(method: str, path: str, payload: dict[str, Any] | None = No
     return json.loads(response_body)
 
 
-def reserve_state(service: str) -> dict[str, Any]:
-    response = supabase_request("POST", "rpc/reserve_review_state", {"p_service": service})
-    if isinstance(response, list):
-        if not response:
-            raise RuntimeError("Supabase did not return service state.")
-        return response[0]
-    if not isinstance(response, dict):
-        raise RuntimeError("Supabase returned invalid service state.")
-    return response
+STATE_COUNTER_KEYS = (
+    "generation_count",
+    "seo_index",
+    "focus_index",
+    "tone_index",
+    "perspective_index",
+    "property_location_style_index",
+    "company_name_counter",
+    "avoid_words_index",
+)
+
+
+def build_fallback_state(service: str) -> dict[str, Any]:
+    # All counters advance together in reserve_review_state, so a single random
+    # value across every key reproduces a valid rotation combination.
+    counter = random.randrange(1_000_000)
+    state: dict[str, Any] = {key: counter for key in STATE_COUNTER_KEYS}
+    state["service"] = service
+    return state
+
+
+def reserve_state(service: str) -> tuple[dict[str, Any], str]:
+    try:
+        response = supabase_request("POST", "rpc/reserve_review_state", {"p_service": service})
+        if isinstance(response, list):
+            if not response:
+                raise RuntimeError("Supabase did not return service state.")
+            return response[0], "supabase"
+        if not isinstance(response, dict):
+            raise RuntimeError("Supabase returned invalid service state.")
+        return response, "supabase"
+    except Exception as exc:
+        print(f"WARNING reserve_state falling back to random rotation state: {exc}")
+        return build_fallback_state(service), "fallback"
 
 
 def fetch_recent_reviews(service: str) -> list[str]:
@@ -119,7 +145,11 @@ def fetch_recent_reviews(service: str) -> list[str]:
         "&order=created_at.desc"
         f"&limit={CACHE_LIMIT}"
     )
-    rows = supabase_request("GET", query)
+    try:
+        rows = supabase_request("GET", query)
+    except Exception as exc:
+        print(f"WARNING fetch_recent_reviews falling back to empty history: {exc}")
+        return []
     if not isinstance(rows, list):
         return []
 
@@ -182,7 +212,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
     timings_ms["validate"] = round((time.perf_counter() - step_start) * 1000)
 
     step_start = time.perf_counter()
-    state = reserve_state(values["service"])
+    state, state_source = reserve_state(values["service"])
     timings_ms["reserve_state"] = round((time.perf_counter() - step_start) * 1000)
 
     step_start = time.perf_counter()
@@ -225,7 +255,10 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
         "similarity": result["similarity"],
     }
     step_start = time.perf_counter()
-    save_review_history(history_payload)
+    try:
+        save_review_history(history_payload)
+    except Exception as exc:
+        print(f"WARNING save_review_history skipped, review already generated: {exc}")
     timings_ms["save_review_history"] = round((time.perf_counter() - step_start) * 1000)
     timings_ms["total"] = round((time.perf_counter() - total_start) * 1000)
 
@@ -240,6 +273,7 @@ def generate_review(payload: dict[str, Any]) -> dict[str, Any]:
             "perspective_rule": selected_inputs["perspective_rule"],
             "review_structure_rule": selected_inputs["review_structure_rule"],
             "review_char_limit": values["review_char_limit"],
+            "state_source": state_source,
             "timings_ms": timings_ms,
         },
     }
